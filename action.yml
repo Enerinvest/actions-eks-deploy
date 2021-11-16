@@ -74,6 +74,20 @@ runs:
       env:
         KUBE_CONFIG_DATA: ${{ inputs.KUBE_CONFIG_DATA }}
       with:
+        args: cat /tmp/config
+
+    - name: apply config
+      uses: enerinvest/actions-kubectl-eks@1.0
+      env:
+        KUBE_CONFIG_DATA: ${{ inputs.KUBE_CONFIG_DATA }}
+      with:
+        args: echo $KUBECONFIG
+
+    - name: apply config
+      uses: enerinvest/actions-kubectl-eks@1.0
+      env:
+        KUBE_CONFIG_DATA: ${{ inputs.KUBE_CONFIG_DATA }}
+      with:
         args: kubectl apply -f .github/kube/config.yaml
 
 
