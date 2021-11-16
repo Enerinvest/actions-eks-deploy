@@ -1,16 +1,6 @@
 name: "k8s deploy"
 description: "deploy to k8s"
 inputs: 
-  # IMAGE_URL:
-  #   required: true
-  # PROJECT: 
-  #   required: true
-  # ENERINAPP: 
-  #   required: true
-  # ENVIRONMENT: 
-  #   required: true   
-  # TIER: 
-  #   required: true  
   AWS_REGION: 
     required: false
     default: "eu-west-1"      
@@ -18,18 +8,12 @@ inputs:
     required: true
   AWS_SECRET_KEY: 
     required: true
-  # PORT: 
-  #   required: false
-  #   default: "3000"    
-  # PUBLISH_URL: 
-  #   required: true
-  # KUBE_CONFIG_DATA: 
-  #   required: true    
-  # NAMESPACE: 
-  #   required: true
-  K8S_TEMPLATES:
+  K8S_TEMPLATES_MAIN:
     required: false
-    default: ".github/k8s/config .github/k8s/worker .github/k8s/delayedjob .github/k8s/service .github/k8s/ingress"    
+    default: ".k8s/templates/config .k8s/templates/deployment-tier .k8s/templates/deployment-delayedjob .k8s/templates/service-tier .k8s/templates/ingress-tier"    
+  K8S_TEMPLATES_EXTRA:
+    required: false
+    default: ""    
 runs:
   using: "composite"
   steps:
@@ -60,18 +44,22 @@ runs:
     - name: prep manifests
       shell: bash
       run: |
-        for tmpl in ${{ inputs.K8S_TEMPLATES}}; do 
-          if [ -f ${tmpl}.tmpl ]; then 
-            echo "Processiong ${tmpl}.tmpl"
-            cat  ${tmpl}.tmpl | envsubst > ${tmpl}.yaml
-            echo "Generated ${tmpl}.yaml:"
-            cat ${tmpl}.yaml
+        for tmpl in ${{ inputs.K8S_TEMPLATES}} ${{inputs.K8S_TEMPLATES_EXTRA}}; do 
+          if [ -f ${tmpl}.yml ]; then 
+            echo "Processiong ${tmpl}.yml"
+            cat  ${tmpl}.yml | envsubst > ${tmpl}.processed.yml
+            echo "Generated ${tmpl}.processed.yml:"
+            MANIFESTS="$MANIFESTS ${tmpl}.processed.yml"
+            cat ${tmpl}.processed.yml
           fi 
-        done 
+        done
+        echo $MANIFESTS >> $GITHUB_ENV 
 
     - name: apply config
       uses: enerinvest/actions-kubectl-eks@1.0
       with:
-        args: kubectl apply -f .github/k8s/config.yaml
+        args: for i in $MANIFESTS; do kubectl apply -f $i; done
+      env: 
+        MANIFESTS: "${{ env.MANIFESTS }}"
 
 
