@@ -72,16 +72,6 @@ runs:
     - name: apply config
       uses: enerinvest/actions-kubectl-eks@1.0
       with:
-        args: cat /tmp/config
-
-    - name: apply config
-      uses: enerinvest/actions-kubectl-eks@1.0
-      with:
-        args: echo $KUBECONFIG
-
-    - name: apply config
-      uses: enerinvest/actions-kubectl-eks@1.0
-      with:
-        args: kubectl apply -f .github/kube/config.yaml
+        args: kubectl apply -f .github/k8s/config.yaml
 
 
