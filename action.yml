@@ -113,6 +113,6 @@ runs:
       if: ${{ env.ACTION == 'deploy' }}
       uses: enerinvest/actions-kubectl-eks@1.0
       with:
-        args: for i in `yq e -N 'select(.kind == "Deployment").metadata.name' $MANIFESTS`; echo $i status:; do kubectl rollout status $i; done
+        args: for i in `yq e -N 'select(.kind == "Deployment").metadata.name' $MANIFESTS`;do echo $i status:; do kubectl rollout status $i; done
 
 
