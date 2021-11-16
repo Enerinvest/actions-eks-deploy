@@ -10,7 +10,7 @@ inputs:
     required: true
   K8S_TEMPLATES_MAIN:
     required: false
-    default: ".k8s/templates/config .k8s/templates/serviceaccount.yml .k8s/templates/deployment-tier .k8s/templates/service-tier .k8s/templates/ingress-tier"    
+    default: ".k8s/templates/config .k8s/templates/serviceaccount .k8s/templates/deployment-tier .k8s/templates/service-tier .k8s/templates/ingress-tier"    
   K8S_TEMPLATES_EXTRA:
     required: false
     default: ""    
@@ -59,6 +59,7 @@ runs:
             echo "Generated ${tmpl}.processed.yml:"
             MANIFESTS="$MANIFESTS ${tmpl}.processed.yml"
             cat ${tmpl}.processed.yml
+            echo "...."
           fi 
         done
         echo MANIFESTS="$MANIFESTS" >> $GITHUB_ENV 
