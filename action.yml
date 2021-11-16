@@ -14,12 +14,22 @@ inputs:
   K8S_TEMPLATES_EXTRA:
     required: false
     default: ""    
-  ACTION:
-    required: true
+  # ACTION:
+  #   required: true
 runs:
   using: "composite"
   steps:
 
+    - name: set action deploy
+      if: ${{ github.event.action != 'closed' }}
+      shell: bash
+      run: echo ACTION="deploy" >> $GITHUB_ENV
+
+    - name: set action delete
+      if: ${{ github.event.action == 'closed' }}
+      shell: bash
+      run: echo ACTION="delete" >> $GITHUB_ENV
+        
     - name: Set deployment id
       shell: bash
       run: |
@@ -65,7 +75,7 @@ runs:
         echo MANIFESTS="$MANIFESTS" >> $GITHUB_ENV 
 
     - name: apply config
-      if: ${{ inputs.ACTION == 'deploy' }}
+      if: ${{ env.ACTION == 'deploy' }}
       uses: enerinvest/actions-kubectl-eks@1.0
       with:
         args: for i in $MANIFESTS; do kubectl apply -f $i; done
@@ -73,7 +83,7 @@ runs:
         MANIFESTS: "${{ env.MANIFESTS }}"
 
     - name: delete config
-      if: ${{ inputs.ACTION == 'delete' }}
+      if: ${{ env.ACTION == 'delete' }}
       uses: enerinvest/actions-kubectl-eks@1.0
       with:
         args: for i in $MANIFESTS; do kubectl delete -f $i; done
