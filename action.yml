@@ -116,7 +116,7 @@ runs:
       if: ${{ env.ACTION == 'deploy' }}
       uses: enerinvest/actions-kubectl-eks@1.0
       with:
-        args: for i in $DEPLOYMENTS; do echo $i status:; kubectl rollout status $i; done
+        args: for i in $DEPLOYMENTS; do echo $i status:; kubectl rollout status -w deployment/$i --timeout 60s; done
       env: 
         DEPLOYMENTS: "${{ env.DEPLOYMENTS }}"        
 
