@@ -91,7 +91,10 @@ runs:
             echo "...."
           fi 
         done
-        echo MANIFESTS="$MANIFESTS" >> $GITHUB_ENV 
+        echo MANIFESTS="$MANIFESTS" >> $GITHUB_ENV
+        for i in `yq e -N 'select(.kind == "Deployment").metadata.name' $MANIFESTS`;do DEPLOYMENTS="$DEPLOYMENTS $i"; done
+        echo DEPLOYMENTS="$DEPLOYMENTS" >> $GITHUB_ENV
+        echo $DEPLOYMENTS 
 
     - name: apply config
       if: ${{ env.ACTION == 'deploy' }}
@@ -113,8 +116,8 @@ runs:
       if: ${{ env.ACTION == 'deploy' }}
       uses: enerinvest/actions-kubectl-eks@1.0
       with:
-        args: for i in `yq e -N 'select(.kind == "Deployment").metadata.name' $MANIFESTS`;do echo $i status:; kubectl rollout status $i; done
+        args: for i in $DEPLOYMENTS; do echo $i status:; kubectl rollout status $i; done
       env: 
-        MANIFESTS: "${{ env.MANIFESTS }}"        
+        DEPLOYMENTS: "${{ env.DEPLOYMENTS }}"        
 
 
