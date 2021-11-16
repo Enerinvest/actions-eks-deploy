@@ -46,7 +46,7 @@ runs:
     - name: prep manifests
       shell: bash
       run: |
-        for tmpl in ${{ inputs.K8S_TEMPLATES}} ${{inputs.K8S_TEMPLATES_EXTRA}}; do 
+        for tmpl in ${{ inputs.K8S_TEMPLATES_MAIN}} ${{inputs.K8S_TEMPLATES_EXTRA}}; do 
           if [ -f ${tmpl}.yml ]; then 
             echo "Processiong ${tmpl}.yml"
             cat  ${tmpl}.yml | envsubst > ${tmpl}.processed.yml
