@@ -61,7 +61,7 @@ runs:
             cat ${tmpl}.processed.yml
           fi 
         done
-        echo $MANIFESTS >> $GITHUB_ENV 
+        echo MANIFESTS="$MANIFESTS" >> $GITHUB_ENV 
 
     - name: apply config
       if: ${{ inputs.ACTION == 'deploy' }}
