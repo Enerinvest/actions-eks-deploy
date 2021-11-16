@@ -114,5 +114,7 @@ runs:
       uses: enerinvest/actions-kubectl-eks@1.0
       with:
         args: for i in `yq e -N 'select(.kind == "Deployment").metadata.name' $MANIFESTS`;do echo $i status:; kubectl rollout status $i; done
+      env: 
+        MANIFESTS: "${{ env.MANIFESTS }}"        
 
 
