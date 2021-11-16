@@ -109,5 +109,10 @@ runs:
       env: 
         MANIFESTS: "${{ env.MANIFESTS }}"
 
+    - name: rollout status
+      if: ${{ env.ACTION == 'deploy' }}
+      uses: enerinvest/actions-kubectl-eks@1.0
+      with:
+        args: for i in `yq e -N 'select(.kind == "Deployment").metadata.name' $MANIFESTS`; echo $i status:; do kubectl rollout status $i; done
 
-#item="$(< test2.yaml)" yq eval '.spec.template.spec.containers[] |= .env += env(item) ' templates/deployment-tier.yml
+
