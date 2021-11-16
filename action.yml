@@ -10,10 +10,12 @@ inputs:
     required: true
   K8S_TEMPLATES_MAIN:
     required: false
-    default: ".k8s/templates/config .k8s/templates/deployment-tier .k8s/templates/deployment-delayedjob .k8s/templates/service-tier .k8s/templates/ingress-tier"    
+    default: ".k8s/templates/config .k8s/templates/deployment-tier .k8s/templates/service-tier .k8s/templates/ingress-tier"    
   K8S_TEMPLATES_EXTRA:
     required: false
     default: ""    
+  ACTION:
+    required: true
 runs:
   using: "composite"
   steps:
@@ -56,10 +58,18 @@ runs:
         echo $MANIFESTS >> $GITHUB_ENV 
 
     - name: apply config
+      if: ${{ inputs.ACTION == 'deploy' }}
       uses: enerinvest/actions-kubectl-eks@1.0
       with:
         args: for i in $MANIFESTS; do kubectl apply -f $i; done
       env: 
         MANIFESTS: "${{ env.MANIFESTS }}"
 
+    - name: delete config
+      if: ${{ inputs.ACTION == 'delete' }}
+      uses: enerinvest/actions-kubectl-eks@1.0
+      with:
+        args: for i in $MANIFESTS; do kubectl delete -f $i; done
+      env: 
+        MANIFESTS: "${{ env.MANIFESTS }}"
 
