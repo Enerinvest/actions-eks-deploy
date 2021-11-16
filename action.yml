@@ -10,7 +10,13 @@ inputs:
     required: true
   K8S_TEMPLATES_MAIN:
     required: false
-    default: ".k8s/templates/config .k8s/templates/serviceaccount .k8s/templates/deployment-tier .k8s/templates/service-tier .k8s/templates/ingress-tier"    
+    default: ".k8s/templates/config .k8s/templates/serviceaccount .k8s/templates/service-tier .k8s/templates/ingress-tier"    
+  K8S_TEMPLATES_DEPLOYMENTS:
+    required: false
+    default: ".k8s/templates/deployment-tier"    
+  K8S_TEMPLATES_DEPLOYMENTS_EXTRA:
+    required: false
+    default: ""       
   K8S_TEMPLATES_EXTRA:
     required: false
     default: ""    
@@ -29,7 +35,9 @@ runs:
       if: ${{ github.event.action == 'closed' }}
       shell: bash
       run: echo ACTION="delete" >> $GITHUB_ENV
-        
+    
+    - uses: FranzDiebold/github-env-vars-action@v2
+
     - name: Set deployment id
       shell: bash
       run: |
@@ -59,10 +67,21 @@ runs:
       with:
         registries: ${{ inputs.DOCKER_REGISTRY_NAME }}
 
+    - name: override envvars
+      shell: bash
+      run: |
+        if [ -f ".env-override.$CI_REF_NAME_SLUG.yml" ]; then 
+          for tmpl in ${{ inputs.K8S_TEMPLATES_DEPLOYMENTS }} ${{ inputs.K8S_TEMPLATES_DEPLOYMENTS_EXTRA }}; do 
+            if [ -f ${tmpl}.yml ]; then 
+              item="$(< .env-override.$CI_REF_NAME_SLUG.yml)" yq eval --inplace '.spec.template.spec.containers[] |= .env += env(item) ' ${tmpl}.yml
+            fi 
+          done
+        fi
+
     - name: prep manifests
       shell: bash
       run: |
-        for tmpl in ${{ inputs.K8S_TEMPLATES_MAIN}} ${{inputs.K8S_TEMPLATES_EXTRA}}; do 
+        for tmpl in ${{ inputs.K8S_TEMPLATES_MAIN}} ${{ inputs.K8S_TEMPLATES_DEPLOYMENTS }} ${{ inputs.K8S_TEMPLATES_DEPLOYMENTS_EXTRA }} ${{inputs.K8S_TEMPLATES_EXTRA}}; do 
           if [ -f ${tmpl}.yml ]; then 
             echo "Processiong ${tmpl}.yml"
             cat  ${tmpl}.yml | envsubst > ${tmpl}.processed.yml
@@ -90,3 +109,5 @@ runs:
       env: 
         MANIFESTS: "${{ env.MANIFESTS }}"
 
+
+#item="$(< test2.yaml)" yq eval '.spec.template.spec.containers[] |= .env += env(item) ' templates/deployment-tier.yml
