@@ -108,7 +108,7 @@ runs:
       if: ${{ env.ACTION == 'delete' }}
       uses: enerinvest/actions-kubectl-eks@1.0
       with:
-        args: for i in $MANIFESTS; do kubectl delete -f $i; done
+        args: for i in $MANIFESTS; do [ "$i" != ".k8s/templates/serviceaccount.processed.yml" ] && kubectl delete -f $i; done
       env: 
         MANIFESTS: "${{ env.MANIFESTS }}"
 
