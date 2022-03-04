@@ -60,8 +60,8 @@ runs:
     - name: install envsubst
       shell: bash
       run: |
-        apt update; apt-get -y install gettext-base
-        
+        sudo apt update; sudo apt-get -y install gettext-base
+
     - name: Configure AWS credentials
       id: login-aws
       uses: aws-actions/configure-aws-credentials@v1
