@@ -57,6 +57,11 @@ runs:
       with:
         endpoint: builders
 
+    - name: install envsubst
+      shell: bash
+      run: |
+        apt update; apt-get -y install gettext-base
+        
     - name: Configure AWS credentials
       id: login-aws
       uses: aws-actions/configure-aws-credentials@v1
