@@ -50,12 +50,12 @@ runs:
       id: buildx-context
       shell: bash       
       run: |
-        docker context create builders
+        docker context create deployers
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
       with:
-        endpoint: builders
+        endpoint: deployers
 
     - name: Configure AWS credentials
       id: login-aws
