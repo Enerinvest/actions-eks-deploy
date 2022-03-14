@@ -109,6 +109,8 @@ runs:
         for i in `yq e -N 'select(.kind == "Deployment").metadata.name' $MANIFESTS`;do DEPLOYMENTS="$DEPLOYMENTS $i"; done
         echo DEPLOYMENTS="$DEPLOYMENTS" >> $GITHUB_ENV
         echo $DEPLOYMENTS 
+      env:
+        DOLLAR: "$"
 
     - name: apply config
       if: ${{ env.ACTION == 'deploy' }}
